@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using AutoMapper;
 
+using ConsoleApp._common;
+
+
 namespace ConsoleApp
 {
     public class Tests1
@@ -12,7 +15,7 @@ namespace ConsoleApp
             conversion2_conversionParametree();
             conversion3_viaProfile();
 
-            conversionList();
+            listConversion();
 
             Console.ReadKey();
         }
@@ -57,9 +60,14 @@ namespace ConsoleApp
         }
 
 
+        //=====================================================================
+
+
 
         private static void conversion1_DirecteSansRetravailler()
         {
+            Console.WriteLine("\n\n\n===========  conversion1_DirecteSansRetravailler  =============\n\n");
+
             Source1 oSource1 = _getSource1();
             Desti1 oDesti1;
 
@@ -86,7 +94,7 @@ namespace ConsoleApp
             oDesti1 = _conversionDirecteSansRetravailler(oSource1, oDesti1);
 
 
-            _debug(oDesti1);
+            Debug.Show(oDesti1);
         }
         private static TDesti _conversionDirecteSansRetravailler<TSource, TDesti>(TSource poSource, TDesti poDesti)
         {
@@ -111,12 +119,14 @@ namespace ConsoleApp
 
         private static void conversion2_conversionParametree()
         {
+            Console.WriteLine("\n\n\n===========  conversion2_conversionParametree  =============\n\n");
+
             Source1 oSource1 = _getSource1();
             Desti1 oDesti1;
 
             oDesti1 = _getAutoMapper2<Source1, Desti1>().Map<Desti1>(oSource1);
 
-            _debug(oDesti1);
+            Debug.Show(oDesti1);
         }
         private static IMapper _getAutoMapper2<TSource, TDesti>()
             where TSource : Source1
@@ -144,7 +154,7 @@ namespace ConsoleApp
                       //.ForMember(poDesti => poDesti.maSomme, opt => opt.MapFrom<MyTotal1Resolver<TSource, TDesti>>())  //Utilisation d'un IValueResolver
                       .ForMember(poDesti => poDesti.maSomme, opt => opt.MapFrom(poSource => poSource.toSomme1 + poSource.toSomme2))  //Résultat équivalant à ci-dessus
 
-                    //.ForMember(poDesti => poDesti.poids, opt => opt.ConvertUsing(new KilogrammesVersGrammesAsStringConverter()))  //Utilisation d'un IValueConverter (le membre source sera celui matchant par le nom à "poids")
+                    .ForMember(poDesti => poDesti.poids, opt => opt.ConvertUsing(new KilogrammesVersGrammesAsStringConverter()))  //Utilisation d'un IValueConverter (le membre source sera celui matchant par le nom à "poids")
                     //.ForMember(poDesti => poDesti.poids, opt => opt.MapFrom(poSource => $"{1000 * poSource.poids}g"))  //Résultat équivalant à ci-dessus
 
 
@@ -186,12 +196,14 @@ namespace ConsoleApp
 
         private static void conversion3_viaProfile()
         {
+            Console.WriteLine("\n\n\n===========  conversion3_viaProfile  =============\n\n");
+
             Source1 oSource1 = _getSource1();
             Desti1 oDesti1;
 
             oDesti1 = _getAutoMapper3().Map<Desti1>(oSource1);
 
-            _debug(oDesti1);
+            Debug.Show(oDesti1);
         }
 
         private static IMapper _getAutoMapper3()
@@ -227,16 +239,17 @@ namespace ConsoleApp
             return (oSource2List);
         }
 
-        private static void conversionList()
+        private static void listConversion()
         {
+            Console.WriteLine("\n\n\n===========  listConversion  =============\n\n");
+
             List<Source2> oSource2List = _getSource2List();
 
             List<Desti2> oDesti2List = _getListMapper().Map<List<Desti2>>(oSource2List);
 
 
-            Console.WriteLine("\n\n\n=====================================================\n\n\n");
 
-            _debug(oDesti2List);
+            Debug.Show(oDesti2List);
         }
 
         private static IMapper _getListMapper()
@@ -256,15 +269,6 @@ namespace ConsoleApp
             return (oMapper);
         }
 
-
-
-
-
-        //=========================================================================================
-        private static void _debug(object pObject)
-        {
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(pObject) + "\n\n");
-        }
 
 
     }
