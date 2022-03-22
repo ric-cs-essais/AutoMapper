@@ -17,9 +17,10 @@ namespace ConsoleApp
 
             listConversion();
 
+            conversion_afterMap_BeforeMap();
+
             Console.ReadKey();
         }
-
 
 
         private static Source1 _getSource1()
@@ -270,6 +271,69 @@ namespace ConsoleApp
         }
 
 
+        //---------------------------------------------------------------------------------------------------------------------------------------------------------
+        private static void conversion_afterMap_BeforeMap()
+        {
+            Console.WriteLine("\n\n===================== BeforeMap, AfterMap ============================\n");
+
+            Source2 oSource2 = new Source2
+            {
+                entier = 333,
+                chaineNumerique = "33",
+                date = DateTime.Parse("30/11/2017 07:20:19")
+            };
+
+            Desti2 oDesti2 = _getMapperBeforeAfter1().Map<Desti2>(oSource2);
+            Debug.Show(oDesti2);
+
+            Desti2 oDesti2b = _getMapperBeforeAfter2().Map<Desti2>(oSource2);
+            Debug.Show(oDesti2b);
+        }
+
+        private static IMapper _getMapperBeforeAfter1()
+        {
+            MapperConfiguration oMapperConfig = new MapperConfiguration(
+                (IMapperConfigurationExpression poConfig) => {
+
+                    poConfig.CreateMap<Source2, Desti2>()
+                     .BeforeMap((poSource, poDesti) =>{
+                         poSource.entier += 1000;
+                     })
+                     .AfterMap((poSource, poDesti) => {
+                         poDesti.date += "***";
+                     })
+                     .ForMember(poDesti => poDesti.date, opt => opt.MapFrom(poSource => poSource.date.ToString() + " !!!"))
+
+                    ;
+
+
+                }
+            );
+            IMapper oMapper = oMapperConfig.CreateMapper();
+            return (oMapper);
+        }
+
+        private static IMapper _getMapperBeforeAfter2()
+        {
+            MapperConfiguration oMapperConfig = new MapperConfiguration(
+                (IMapperConfigurationExpression poConfig) => {
+
+                    poConfig.CreateMap<Source2, Desti2>()
+                     .BeforeMap<MyBeforeMapAction>()
+                     .AfterMap<MyAfterMapAction>()
+                     .ForMember(poDesti => poDesti.date, opt => opt.MapFrom(poSource => poSource.date.ToString() + " !!!"))
+
+                    ;
+
+
+                }
+            );
+            IMapper oMapper = oMapperConfig.CreateMapper();
+            return (oMapper);
+        }
+
+
+
 
     }
 
@@ -301,6 +365,23 @@ namespace ConsoleApp
         public string Convert(int correspondingSourceMemberValue, ResolutionContext dummy)
         {
             return ($"{1000 * correspondingSourceMemberValue}g");
+        }
+    }
+
+    class MyBeforeMapAction : IMappingAction<Source2, Desti2>
+    {
+        public void Process(Source2 poSource, Desti2 poDesti, ResolutionContext dummy)
+        {
+            poSource.chaineNumerique += "88";
+            poSource.entier += 2000;
+        }
+    }
+
+    class MyAfterMapAction : IMappingAction<Source2, Desti2>
+    {
+        public void Process(Source2 poSource, Desti2 poDesti, ResolutionContext dummy)
+        {
+            poDesti.date += "^^^^^^^";
         }
     }
 }
